@@ -10,7 +10,7 @@ public class ShootAction : BaseAction
     public class OnShootEventArgs : EventArgs
     {
         public Unit targetUnit;
-        public Unit shootingUnit;
+        public Unit attackingUnit;
     }
 
     private enum State
@@ -83,22 +83,24 @@ public class ShootAction : BaseAction
 
     private void Aim()
     {
-        Vector3 aimDir = (targetUnit.GetWorldPosition() - transform.position).normalized;
+        Vector3 aimDirection = (targetUnit.GetWorldPosition() - transform.position).normalized;
+        Quaternion quatTargetRotation = Quaternion.FromToRotation(Vector3.up, aimDirection);
+
         float rotateSpeed = 10f;
-        transform.forward = Vector3.Slerp(transform.forward, aimDir, Time.deltaTime * rotateSpeed);
+        transform.rotation = Quaternion.Slerp(transform.rotation, quatTargetRotation, Time.deltaTime * rotateSpeed);
     }
     private void Shoot()
     {
         OnAnyShoot?.Invoke(this, new OnShootEventArgs
         {
             targetUnit = targetUnit,
-            shootingUnit = unit
+            attackingUnit = unit
         });
 
         OnShoot?.Invoke(this, new OnShootEventArgs
         {
             targetUnit = targetUnit,
-            shootingUnit = unit
+            attackingUnit = unit
         });
 
         targetUnit.Damage(damage, unit.transform);
@@ -121,9 +123,9 @@ public class ShootAction : BaseAction
 
         for (int x = -maxShootDistance; x <= maxShootDistance; x++)
         {
-            for (int z = -maxShootDistance; z <= maxShootDistance; z++)
+            for (int y = -maxShootDistance; y <= maxShootDistance; y++)
             {
-                GridPosition offsetGridPosition = new GridPosition(x, z);
+                GridPosition offsetGridPosition = new GridPosition(x, y);
                 GridPosition testGridPosition = unitGridPosition + offsetGridPosition;
 
                 if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
@@ -131,7 +133,7 @@ public class ShootAction : BaseAction
                     continue;
                 }
 
-                int testDistance = (Mathf.Abs(x) * Mathf.Abs(x)) + (Mathf.Abs(z) * Mathf.Abs(z));
+                int testDistance = (Mathf.Abs(x) * Mathf.Abs(x)) + (Mathf.Abs(y) * Mathf.Abs(y));
                 if(testDistance > (maxShootDistance * maxShootDistance))
                 {
                     continue;
@@ -157,7 +159,7 @@ public class ShootAction : BaseAction
                 Vector3 unitWorldPosition = LevelGrid.Instance.GetWorldPosition(unitGridPosition);
                 Vector3 shootDirection = (targetUnit.GetWorldPosition() - unitWorldPosition).normalized;
                 float unitShoulderHeight = 1.7f;
-                if (Physics.Raycast(unitWorldPosition + Vector3.up * unitShoulderHeight,
+                if (Physics.Raycast(unitWorldPosition + -Vector3.forward * unitShoulderHeight,
                     shootDirection,
                     Vector3.Distance(unitWorldPosition, targetUnit.GetWorldPosition()), 
                     obstaclesLayerMask))

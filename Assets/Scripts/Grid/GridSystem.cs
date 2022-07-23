@@ -19,24 +19,24 @@ public class GridSystem<TGridObject>
 
         for (int x = 0; x < width; x++)
         {
-            for (int z = 0; z < height; z++)
+            for (int y = 0; y < height; y++)
             {
-                GridPosition gridPosition = new GridPosition(x, z);
-                gridObjectArray[x, z] = createGridObject(this, gridPosition);
+                GridPosition gridPosition = new GridPosition(x, y);
+                gridObjectArray[x, y] = createGridObject(this, gridPosition);
             }
         }
     }
 
     public Vector3 GetWorldPosition(GridPosition gridPosition)
     {
-        return new Vector3(gridPosition.x, 0, gridPosition.z) * cellSize;
+        return new Vector3(gridPosition.x, gridPosition.y, 0) * cellSize;
     }
 
     public GridPosition GetGridPosition(Vector3 worldPosition)
     {
         return new GridPosition(
             Mathf.RoundToInt(worldPosition.x / cellSize),
-            Mathf.RoundToInt(worldPosition.z / cellSize)
+            Mathf.RoundToInt(worldPosition.y / cellSize)
         );
     }
 
@@ -44,9 +44,9 @@ public class GridSystem<TGridObject>
     {
         for (int x = 0; x < width; x++)
         {
-            for (int z = 0; z < height; z++)
+            for (int y = 0; y < height; y++)
             {
-                GridPosition gridPosition = new GridPosition(x, z);
+                GridPosition gridPosition = new GridPosition(x, y);
                 Transform debugTransform = GameObject.Instantiate(debugPrefab, GetWorldPosition(gridPosition), Quaternion.identity);
                 GridDebugObject gridDebugObject = debugTransform.GetComponent<GridDebugObject>();
                 gridDebugObject.SetGridObject(GetGridObject(gridPosition));
@@ -56,15 +56,15 @@ public class GridSystem<TGridObject>
 
     public TGridObject GetGridObject(GridPosition gridPosition)
     {
-        return gridObjectArray[gridPosition.x, gridPosition.z];
+        return gridObjectArray[gridPosition.x, gridPosition.y];
     }
 
     public bool isValidGridPosition(GridPosition gridPosition)
     {
         return gridPosition.x >= 0 && 
             gridPosition.x < width && 
-            gridPosition.z >= 0 && 
-            gridPosition.z < height;
+            gridPosition.y >= 0 && 
+            gridPosition.y < height;
     }
 
     public int GetHeight()

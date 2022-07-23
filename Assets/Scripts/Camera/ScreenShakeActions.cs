@@ -8,8 +8,14 @@ public class ScreenShakeActions : MonoBehaviour
     private void Start()
     {
         ShootAction.OnAnyShoot += ShootAction_OnAnyShoot;
+        OverwatchAction.OnAnyOverwatchTriggered += OverwatchAction_OnAnyOverwatchTriggered;
         GrenadeProjectile.OnAnyGrenadeExploded += GrenadeProjectile_OnAnyGrenadeExploded;
         MeleeAction.OnAnyMelee += MeleeAction_OnAnyMelee;
+    }
+
+    private void OverwatchAction_OnAnyOverwatchTriggered(object sender, OverwatchAction.OnOverwatchTriggeredArgs e)
+    {
+        ScreenShake.Instance.Recoil();
     }
 
     private void MeleeAction_OnAnyMelee(object sender, MeleeAction.OnMeleeEventArgs e)

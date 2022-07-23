@@ -3,7 +3,7 @@ using System;
 public struct GridPosition : IEquatable<GridPosition>
 {
     public int x;
-    public int z;
+    public int y;
 
     public static GridPosition Zero
     {
@@ -13,10 +13,10 @@ public struct GridPosition : IEquatable<GridPosition>
         }
     }
 
-    public GridPosition(int x, int z)
+    public GridPosition(int x, int y)
     {
         this.x = x;
-        this.z = z;
+        this.y = y;
     }
 
     #region Overrides
@@ -25,7 +25,7 @@ public struct GridPosition : IEquatable<GridPosition>
     {
         return obj is GridPosition position &&
                x == position.x &&
-               z == position.z;
+               y == position.y;
     }
 
     public bool Equals(GridPosition other)
@@ -35,17 +35,17 @@ public struct GridPosition : IEquatable<GridPosition>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(x, z);
+        return HashCode.Combine(x, y);
     }
 
     public override string ToString()
     {
-        return $"X: {x}, Z: {z}";
+        return $"X: {x}, Z: {y}";
     }
 
     public static bool operator == (GridPosition a, GridPosition b)
     {
-        return a.x == b.x && a.z == b.z;
+        return a.x == b.x && a.y == b.y;
     }
     public static bool operator != (GridPosition a, GridPosition b)
     {
@@ -53,27 +53,27 @@ public struct GridPosition : IEquatable<GridPosition>
     }
     public static bool operator >= (GridPosition a, GridPosition b)
     {
-        return a.x >= b.x && a.z >= b.z;
+        return a.x >= b.x && a.y >= b.y;
     }
     public static bool operator <= (GridPosition a, GridPosition b)
     {
-        return a.x <= b.x && a.z <= b.z;
+        return a.x <= b.x && a.y <= b.y;
     }
     public static bool operator > (GridPosition a, GridPosition b)
     {
-        return a.x > b.x && a.z > b.z;
+        return a.x > b.x && a.y > b.y;
     }
     public static bool operator < (GridPosition a, GridPosition b)
     {
-        return a.x < b.x && a.z < b.z;
+        return a.x < b.x && a.y < b.y;
     }
     public static GridPosition operator + (GridPosition a, GridPosition b)
     {
-        return new GridPosition(a.x + b.x, a.z + b.z);
+        return new GridPosition(a.x + b.x, a.y + b.y);
     }
     public static GridPosition operator - (GridPosition a, GridPosition b)
     {
-        return new GridPosition(a.x - b.x, a.z - b.z);
+        return new GridPosition(a.x - b.x, a.y - b.y);
     }
     #endregion
 }

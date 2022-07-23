@@ -25,7 +25,27 @@ public class UnitAnimator : MonoBehaviour
         {
             meleeAction.OnMelee += MeleeAction_OnMelee;
         }
+        if(TryGetComponent<OverwatchAction>(out OverwatchAction overwatchAction))
+        {
+            overwatchAction.OnOverwatchShoot += OverwatchAction_OnOverwatchShoot;
+        }
 
+    }
+
+    private void OverwatchAction_OnOverwatchShoot(object sender, OverwatchAction.OnOverwatchTriggeredArgs e)
+    {
+        _animator.SetTrigger("Shoot");
+
+        Transform bulletProjectileTransform =
+            Instantiate(_bulletProjectilePrefab, _shootPointTransform.position, Quaternion.identity);
+
+        BulletProjectile bulletProjectile = bulletProjectileTransform.GetComponent<BulletProjectile>();
+
+        Vector3 targetUnitShootAtPosition = e.targetUnit.GetWorldPosition();
+
+        targetUnitShootAtPosition.z = _shootPointTransform.position.z;
+
+        bulletProjectile.Setup(targetUnitShootAtPosition);
     }
 
     private void MeleeAction_OnMelee(object sender, MeleeAction.OnMeleeEventArgs e)
@@ -44,7 +64,7 @@ public class UnitAnimator : MonoBehaviour
 
         Vector3 targetUnitShootAtPosition = e.targetUnit.GetWorldPosition();
 
-        targetUnitShootAtPosition.y = _shootPointTransform.position.y;
+        targetUnitShootAtPosition.z = _shootPointTransform.position.z;
 
         bulletProjectile.Setup(targetUnitShootAtPosition);
     }

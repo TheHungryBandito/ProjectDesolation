@@ -17,8 +17,10 @@ public class Unit : MonoBehaviour
     private HealthSystem healthSystem;
     private BaseAction[] baseActionArray;
 
+    Vector3 freezePosition;
     private int actionPoints = ACTION_POINTS_MAX;
-
+    private float actionFreezeTimer;
+    private bool isActionFrozen = false;
 
 
     private void Awake()
@@ -34,12 +36,31 @@ public class Unit : MonoBehaviour
 
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
         healthSystem.OnDead += HealthSystem_OnDead;
+        //OverwatchAction.OnAnyOverwatchTriggered += OverwatchAction_OnAnyOverwatchTriggered;
 
         OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
     }
 
+    private void OverwatchAction_OnAnyOverwatchTriggered(object sender, OverwatchAction.OnOverwatchTriggeredArgs e)
+    {
+        float actionFreezeTime = 1f;
+        actionFreezeTimer = actionFreezeTime;
+        freezePosition = transform.position;
+        isActionFrozen = true;
+    }
+
     private void Update()
     {
+        if(isActionFrozen)
+        {
+            transform.position = freezePosition;
+            actionFreezeTimer -= Time.deltaTime;
+            if(actionFreezeTimer <= 0f)
+            {
+                isActionFrozen = false;
+            }
+            return;
+        }
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
         if (newGridPosition != gridPosition)
         {

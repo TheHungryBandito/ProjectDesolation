@@ -16,15 +16,15 @@ public class MoveAction : BaseAction
     {
         if(!isActive) 
         { 
-            return; 
+            return;
         }
 
         Vector3 targetPosition = positionList[currentPositionIndex];
         Vector3 moveDirection = (targetPosition - transform.position).normalized;
+        Quaternion quatTargetRotation = Quaternion.FromToRotation(Vector3.up, moveDirection);
 
         float rotateSpeed = 10f;
-        transform.forward = Vector3.Slerp(transform.forward, moveDirection, Time.deltaTime * rotateSpeed);
-
+        transform.rotation = Quaternion.Slerp(new Quaternion(0, 0, transform.rotation.z, transform.rotation.w), quatTargetRotation, Time.deltaTime * rotateSpeed);
         float stoppingDistance = 0.1f;
         if (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
         {
@@ -124,10 +124,24 @@ public class MoveAction : BaseAction
     {
         int targetCountAtGridPosition = unit.GetAction<ShootAction>()
             .GetTargetCountAtPosition(gridPosition);
-        return new EnemyAIAction
+
+        if (Mathf.RoundToInt((1 - unit.GetHealthNormalized()) * 100f) > 50f)
         {
-            gridPosition = gridPosition,
-            actionValue = targetCountAtGridPosition * 10
-        };
+            return new EnemyAIAction
+            {
+                gridPosition = gridPosition,
+                //actionValue = 200 / (targetCountAtGridPosition + 1)  
+                actionValue = 9999999
+            };
+        }
+        else
+        {
+            return new EnemyAIAction
+            {
+                gridPosition = gridPosition,
+                //actionValue = targetCountAtGridPosition * 10
+                actionValue = 9999999,
+            };
+        }
     }
 }
