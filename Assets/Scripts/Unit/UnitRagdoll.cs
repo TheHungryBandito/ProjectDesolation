@@ -11,10 +11,7 @@ public class UnitRagdoll : MonoBehaviour
         MatchAllChildTransforms(originalRootBone, ragdollRootBone);
 
         ApplyExplosionToRagdoll(ragdollRootBone, 500f, transform.position - hitPosition, 10f);
-
-        Debug.Log(hitPosition);
     }
-
     private void MatchAllChildTransforms(Transform root, Transform clone)
     {
         foreach (Transform child in root)
@@ -29,8 +26,6 @@ public class UnitRagdoll : MonoBehaviour
             }
         }
     }
-
-
     private void ApplyExplosionToRagdoll(Transform root, float explosionForce, Vector3 explosionPosition, float explosionRange)
     {
         foreach (Transform child in root)

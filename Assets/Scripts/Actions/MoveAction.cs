@@ -130,8 +130,7 @@ public class MoveAction : BaseAction
             return new EnemyAIAction
             {
                 gridPosition = gridPosition,
-                //actionValue = 200 / (targetCountAtGridPosition + 1)  
-                actionValue = 9999999
+                actionValue = 200 / (targetCountAtGridPosition + 1)
             };
         }
         else
@@ -139,8 +138,7 @@ public class MoveAction : BaseAction
             return new EnemyAIAction
             {
                 gridPosition = gridPosition,
-                //actionValue = targetCountAtGridPosition * 10
-                actionValue = 9999999,
+                actionValue = targetCountAtGridPosition * 10
             };
         }
     }

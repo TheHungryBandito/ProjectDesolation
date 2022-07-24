@@ -24,6 +24,7 @@ public class OverwatchAction : BaseAction
     }
 
     [SerializeField] private GridVisualTypeSO secondaryGridVisualTypeSO;
+    private HealthSystem healthSystem;
     private Unit targetUnit;
     private ShootAction shootAction;
     private List<GridObject> overwatchedGridObjects;
@@ -32,6 +33,8 @@ public class OverwatchAction : BaseAction
     private float actionTimer;
     private float stateTimer;
     private bool canShootBullet;
+    private bool isOverwatching;
+    private bool isOverwatchTriggered;
     private State state;
 
 
@@ -40,14 +43,17 @@ public class OverwatchAction : BaseAction
     private void Start()
     {
         shootAction = unit.GetAction<ShootAction>();
+        healthSystem = GetComponent<HealthSystem>();
         maxShootDistance = shootAction.GetMaxShootDistance();
         minShootDistance = shootAction.GetMinShootDistance();
         state = State.Aiming;
+
+        healthSystem.OnHealthChanged += HealthSystem_OnHealthChanged;
     }
 
     private void Update()
     {
-        if (targetUnit != null)
+        if (isOverwatchTriggered && targetUnit != null)
         {
             stateTimer -= Time.deltaTime;
             switch (state)
@@ -63,6 +69,7 @@ public class OverwatchAction : BaseAction
                     }
                     break;
                 case State.Cooloff:
+                    isOverwatchTriggered = false;
                     break;
             }
             if (stateTimer <= 0f)
@@ -132,12 +139,12 @@ public class OverwatchAction : BaseAction
         }
         overwatchedGridObjects.Clear();
 
+        isOverwatching = false;
         OnAnyOverwatchEnded?.Invoke(this, EventArgs.Empty);
     }
 
     private void GridObject_OnUnitAdded(object sender, GridObject.OnUnitAddedEventArgs e)
     {
-        Debug.Log($"Unit at this {sender as GridObject}");
         if(e.unit.IsEnemy() == unit.IsEnemy())
         {
             return;
@@ -147,11 +154,30 @@ public class OverwatchAction : BaseAction
         ActionQueueHandler.Instance.AddActionToQueue(TriggerOverwatch);
     }
 
+    private void HealthSystem_OnHealthChanged(object sender, Transform e)
+    {
+        if (!isOverwatching)
+        {
+            return;
+        }
+        Unit targetUnit = e.GetComponent<Unit>();
+        this.targetUnit = targetUnit;
+
+        if(healthSystem.GetHealthNormalized() == 0)
+        {
+            return;
+        }
+        ActionQueueHandler.Instance.AddActionToQueue(TriggerOverwatch);
+    }
+
     private void TriggerOverwatch()
     {
-        if(targetUnit == null)
+        Debug.Log("Overwatch Triggered");
+
+        if (targetUnit == null)
         {
             OnAnyOverwatchEnded?.Invoke(this, EventArgs.Empty);
+            Debug.Log("Overwatch target null");
             return;
         }
         OnAnyOverwatchTriggered?.Invoke(this, new OnOverwatchTriggeredArgs
@@ -164,6 +190,7 @@ public class OverwatchAction : BaseAction
         stateTimer = aimingStateTime;
         state = State.Aiming;
         canShootBullet = true;
+        isOverwatchTriggered = true;
     }
 
     private void Shoot()
@@ -252,7 +279,8 @@ public class OverwatchAction : BaseAction
 
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
-
+        isOverwatching = true;
+        isOverwatchTriggered = false;
         ActionStart(onActionComplete);
 
         StartOverwatch();
@@ -281,6 +309,10 @@ public class OverwatchAction : BaseAction
     public GridVisualTypeSO GetSecondaryGridVisualTypeSO()
     {
         return secondaryGridVisualTypeSO;
+    }
+    public Unit GetTargetUnit()
+    {
+        return targetUnit;
     }
 }
 

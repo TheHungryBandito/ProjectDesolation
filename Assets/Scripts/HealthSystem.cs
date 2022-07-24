@@ -5,8 +5,9 @@ using UnityEngine;
 
 public class HealthSystem : MonoBehaviour
 {
-    public event EventHandler OnHealthChanged;
+    public event EventHandler<Transform> OnHealthChanged;
     public event EventHandler<Transform> OnDead;
+
     [SerializeField] private float health = 100;
     private float healthMax = 100;
 
@@ -15,7 +16,6 @@ public class HealthSystem : MonoBehaviour
     {
         healthMax = health;
     }
-
     public void Damage(float damageAmount, Transform attackersTransform)
     {
         health -= damageAmount;
@@ -24,14 +24,14 @@ public class HealthSystem : MonoBehaviour
         {
             health = 0;
         }
-        OnHealthChanged?.Invoke(this, EventArgs.Empty);
+        OnHealthChanged?.Invoke(this, attackersTransform);
 
         if (health == 0)
         {
             Die(attackersTransform);
         }
 
-        Debug.Log($"{attackersTransform} hit for {damageAmount}.");
+        Debug.Log($"{attackersTransform.name} hit for {damageAmount}.");
     }
     private void Die(Transform attackersTransform)
     {

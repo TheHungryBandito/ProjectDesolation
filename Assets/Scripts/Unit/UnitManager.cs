@@ -48,7 +48,6 @@ public class UnitManager : MonoBehaviour
             friendlyUnitList.Add(unit);
         }
 
-        Debug.Log($"{unit} spawned.");
     }
 
     private void Unit_OnAnyUnitDead(object sender, EventArgs e)
@@ -67,7 +66,6 @@ public class UnitManager : MonoBehaviour
         {
             friendlyUnitList.Remove(unit);
         }
-        Debug.Log($"{unit} died.");
     }
 
     public List<Unit> GetUnitList()

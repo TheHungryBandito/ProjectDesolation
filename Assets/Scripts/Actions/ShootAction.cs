@@ -5,6 +5,7 @@ using UnityEngine;
 public class ShootAction : BaseAction
 {
     public static event EventHandler<OnShootEventArgs> OnAnyShoot;
+    public static event EventHandler OnAnyShootEnded;
     public event EventHandler<OnShootEventArgs> OnShoot;
      
     public class OnShootEventArgs : EventArgs
@@ -48,7 +49,7 @@ public class ShootAction : BaseAction
             case State.Shooting:
                 if (canShootBullet)
                 {
-                    Shoot();
+                    ActionQueueHandler.Instance.AddActionToQueue(Shoot);
                     canShootBullet = false;
                 }
                 break;
@@ -76,6 +77,7 @@ public class ShootAction : BaseAction
                 stateTimer = cooloffStateTime;
                 break;
             case State.Cooloff:
+                OnAnyShootEnded?.Invoke(this, EventArgs.Empty);
                 ActionComplete();
                 break;
         }
@@ -103,9 +105,9 @@ public class ShootAction : BaseAction
             attackingUnit = unit
         });
 
+
         targetUnit.Damage(damage, unit.transform);
     }
-
 
     public override string GetActionName()
     {

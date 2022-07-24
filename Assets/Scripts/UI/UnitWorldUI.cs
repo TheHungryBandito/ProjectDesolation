@@ -21,7 +21,7 @@ public class UnitWorldUI : MonoBehaviour
         UpdateHealthBar();
     }
 
-    private void HealthSystem_OnHealthChanged(object sender, EventArgs e)
+    private void HealthSystem_OnHealthChanged(object sender, Transform e)
     {
         UpdateHealthBar();
     }
