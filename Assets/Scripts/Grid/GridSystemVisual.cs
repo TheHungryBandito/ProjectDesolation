@@ -48,6 +48,7 @@ public class GridSystemVisual : MonoBehaviour
         LevelGrid.Instance.OnAnyUnitMovedGridPosition += LevelGrid_OnAnyUnitMovedGridPosition;
         Unit.OnAnyUnitDead += Unit_OnAnyUnitDead;
         PathfindingUpdater.Instance.OnPathFindingUpdated += PathfindingUpdater_OnPathFindingUpdated;
+        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
 
         UpdateGridVisual();
     }
@@ -126,6 +127,7 @@ public class GridSystemVisual : MonoBehaviour
             }
         }
     }
+
     public void ShowGridPositionList(List<GridPosition> gridPositions, GridVisualTypeSO gridVisualTypeSO)
     {
         for (int i = 0; i < gridPositions.Count; i++)
@@ -193,6 +195,10 @@ public class GridSystemVisual : MonoBehaviour
         UpdateGridVisual();
     }
     private void PathfindingUpdater_OnPathFindingUpdated(object sender, EventArgs e)
+    {
+        UpdateGridVisual();
+    }
+    private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
     {
         UpdateGridVisual();
     }

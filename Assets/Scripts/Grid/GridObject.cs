@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GridObject
 {
-    public event EventHandler<OnUnitAddedEventArgs> OnUnitAdded;
+    public event EventHandler<OnUnitAddedEventArgs> OnUnitChanged;
 
     public class OnUnitAddedEventArgs : EventArgs
     {
@@ -37,7 +37,7 @@ public class GridObject
     public void AddUnit(Unit unit)
     {
         unitList.Add(unit);
-        OnUnitAdded?.Invoke(this, new OnUnitAddedEventArgs
+        OnUnitChanged?.Invoke(this, new OnUnitAddedEventArgs
         {
             unit = unit,
         });
@@ -45,6 +45,10 @@ public class GridObject
     public void RemoveUnit(Unit unit)
     {
         unitList.Remove(unit);
+        OnUnitChanged?.Invoke(this, new OnUnitAddedEventArgs
+        {
+            unit = unit,
+        });
     }
 
     public List<Unit> GetUnitList()

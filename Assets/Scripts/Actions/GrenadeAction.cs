@@ -9,7 +9,7 @@ public class GrenadeAction : BaseAction
     [SerializeField] private GridVisualTypeSO secondaryGridVisualTypeSO;
     [SerializeField] private Transform grenadeProjectilePrefab;
     [SerializeField] private LayerMask obstaclesLayerMask;
-    private int maxThrowDistance = 7;
+    private int maxThrowDistance = 4;
     private int minThrowDistance = 2;
 
     public override string GetActionName()

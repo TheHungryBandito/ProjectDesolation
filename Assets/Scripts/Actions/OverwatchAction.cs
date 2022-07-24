@@ -10,12 +10,16 @@ public class OverwatchAction : BaseAction
 
     public event EventHandler<OnOverwatchTriggeredArgs> OnOverwatchShoot;
 
+    /* TODO:
+     * When target unit is in range and triggers overwatch but moves out of range
+     * the action will not finish and unit will not shoot
+     */
+
     public class OnOverwatchTriggeredArgs : EventArgs
     {
         public Unit targetUnit;
         public Unit attackingUnit;
     }
-
     private enum State
     {
         Aiming,
@@ -28,6 +32,7 @@ public class OverwatchAction : BaseAction
     private Unit targetUnit;
     private ShootAction shootAction;
     private List<GridObject> overwatchedGridObjects;
+    private float damage;
     private int maxShootDistance;
     private int minShootDistance;
     private float actionTimer;
@@ -46,6 +51,7 @@ public class OverwatchAction : BaseAction
         healthSystem = GetComponent<HealthSystem>();
         maxShootDistance = shootAction.GetMaxShootDistance();
         minShootDistance = shootAction.GetMinShootDistance();
+        damage = shootAction.GetShootDamage();
         state = State.Aiming;
 
         healthSystem.OnHealthChanged += HealthSystem_OnHealthChanged;
@@ -126,7 +132,7 @@ public class OverwatchAction : BaseAction
         foreach(GridPosition gridPosition in validGridPositions)
         {
             GridObject gridObject = LevelGrid.Instance.GetGridObjectAtGridPosition(gridPosition);
-            gridObject.OnUnitAdded += GridObject_OnUnitAdded;
+            gridObject.OnUnitChanged += GridObject_OnUnitRemoved;
             overwatchedGridObjects.Add(gridObject);
         }
     }
@@ -135,7 +141,7 @@ public class OverwatchAction : BaseAction
         targetUnit = null;
         foreach (GridObject gridObject in overwatchedGridObjects)
         {
-            gridObject.OnUnitAdded -= GridObject_OnUnitAdded;
+            gridObject.OnUnitChanged -= GridObject_OnUnitRemoved;
         }
         overwatchedGridObjects.Clear();
 
@@ -143,7 +149,7 @@ public class OverwatchAction : BaseAction
         OnAnyOverwatchEnded?.Invoke(this, EventArgs.Empty);
     }
 
-    private void GridObject_OnUnitAdded(object sender, GridObject.OnUnitAddedEventArgs e)
+    private void GridObject_OnUnitRemoved(object sender, GridObject.OnUnitAddedEventArgs e)
     {
         if(e.unit.IsEnemy() == unit.IsEnemy())
         {
@@ -195,17 +201,17 @@ public class OverwatchAction : BaseAction
 
     private void Shoot()
     {
+        damage = shootAction.GetShootDamage();
+
         OnOverwatchShoot?.Invoke(this, new OnOverwatchTriggeredArgs
         {
             targetUnit = targetUnit,
             attackingUnit = unit
         });
 
-        targetUnit.Damage(40, unit.transform);
+        targetUnit.Damage(damage, unit.transform);
         EndOverwatch();
     }
-
-
 
     public override string GetActionName()
     {
@@ -216,7 +222,7 @@ public class OverwatchAction : BaseAction
     {
         int targetCountAtGridPosition = unit.GetAction<ShootAction>()
             .GetTargetCountAtPosition(gridPosition);
-        return new EnemyAIAction()
+        return new EnemyAIAction
         {
             gridPosition = gridPosition,
             actionValue = 100 / (1 + targetCountAtGridPosition),
@@ -231,6 +237,7 @@ public class OverwatchAction : BaseAction
             unitGridPosition
         };
     }
+
     public List<GridPosition> GetValidActionGridPositionList(GridPosition unitGridPosition)
     {
         List<GridPosition> validGridPositionList = new List<GridPosition>();
@@ -276,7 +283,6 @@ public class OverwatchAction : BaseAction
 
         return validGridPositionList;
     }
-
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
         isOverwatching = true;
@@ -286,7 +292,6 @@ public class OverwatchAction : BaseAction
         StartOverwatch();
 
     }
-
     public override int GetActionPointsCost()
     {
         if(unit.GetActionPoints() > 0)
@@ -295,7 +300,7 @@ public class OverwatchAction : BaseAction
         }
         else
         {
-            return base.GetActionPointsCost();
+            return 1;
         }
     }
     public int GetMaxShootDistance()

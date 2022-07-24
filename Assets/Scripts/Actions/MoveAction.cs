@@ -7,10 +7,34 @@ public class MoveAction : BaseAction
 {
     public event EventHandler OnStartMoving;
     public event EventHandler OnStopMoving;
-    [SerializeField] private int maxMoveDistance = 2;
+    
 
     private List<Vector3> positionList;
     private int currentPositionIndex;
+    [SerializeField] private int maxMoveDistance = 2;
+    private int originalMaxMoveDistance;
+    private int turnsUntilMovementReset = 0;
+
+    private void Start()
+    {
+        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+        originalMaxMoveDistance = maxMoveDistance;
+    }
+
+    private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
+    {
+        if (turnsUntilMovementReset == 0)
+        {
+            return;
+        }
+
+        turnsUntilMovementReset -= 1;
+
+        if (turnsUntilMovementReset == 0)
+        {
+            maxMoveDistance = originalMaxMoveDistance;
+        }
+    }
 
     private void Update()
     {
@@ -119,6 +143,19 @@ public class MoveAction : BaseAction
     public override int GetActionPointsCost()
     {
         return 1;
+    }
+    public int GetMaxMovementDistance()
+    {
+        return maxMoveDistance;
+    }
+    public int GetOriginalMaxMoveDistance()
+    {
+        return originalMaxMoveDistance;
+    }
+    public void ModifyMaxMovementDistance(int maxMoveDistance, int turnsUntilMovementReset)
+    {
+        this.maxMoveDistance = maxMoveDistance;
+        this.turnsUntilMovementReset = turnsUntilMovementReset;
     }
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {

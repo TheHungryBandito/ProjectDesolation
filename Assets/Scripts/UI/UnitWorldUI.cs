@@ -10,6 +10,7 @@ public class UnitWorldUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI actionPointsText;
     [SerializeField] private Unit unit;
     [SerializeField] private Image healthBarImage;
+    [SerializeField] private Image armourBarImage;
     [SerializeField] private HealthSystem healthSystem;
 
     private void Start()
@@ -19,11 +20,13 @@ public class UnitWorldUI : MonoBehaviour
         healthSystem.OnHealthChanged += HealthSystem_OnHealthChanged;
         UpdateActionPointsText();
         UpdateHealthBar();
+        UpdateArmourBar();
     }
 
     private void HealthSystem_OnHealthChanged(object sender, Transform e)
     {
         UpdateHealthBar();
+        UpdateArmourBar();
     }
 
     private void Unit_OnAnyActionPointsChanged(object sender, EventArgs e)
@@ -38,6 +41,10 @@ public class UnitWorldUI : MonoBehaviour
     private void UpdateHealthBar()
     {
         healthBarImage.fillAmount = healthSystem.GetHealthNormalized();
+    }
+    private void UpdateArmourBar()
+    {
+        armourBarImage.fillAmount = healthSystem.GetArmourNormalized();
     }
 
     private void OnDestroy()
