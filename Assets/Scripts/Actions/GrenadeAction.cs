@@ -9,7 +9,7 @@ public class GrenadeAction : BaseAction
     [SerializeField] private GridVisualTypeSO secondaryGridVisualTypeSO;
     [SerializeField] private Transform grenadeProjectilePrefab;
     [SerializeField] private LayerMask obstaclesLayerMask;
-    private int maxThrowDistance = 7;
+    private int maxThrowDistance = 4;
     private int minThrowDistance = 2;
 
     public override string GetActionName()
@@ -49,9 +49,9 @@ public class GrenadeAction : BaseAction
 
         for (int x = -maxThrowDistance; x <= maxThrowDistance; x++)
         {
-            for (int z = -maxThrowDistance; z <= maxThrowDistance; z++)
+            for (int y = -maxThrowDistance; y <= maxThrowDistance; y++)
             {
-                GridPosition offsetGridPosition = new GridPosition(x, z);
+                GridPosition offsetGridPosition = new GridPosition(x, y);
                 GridPosition testGridPosition = unitGridPosition + offsetGridPosition;
 
                 if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
@@ -59,7 +59,7 @@ public class GrenadeAction : BaseAction
                     continue;
                 }
 
-                int testDistance = (Mathf.Abs(x) * Mathf.Abs(x)) + (Mathf.Abs(z) * Mathf.Abs(z));
+                int testDistance = (Mathf.Abs(x) * Mathf.Abs(x)) + (Mathf.Abs(y) * Mathf.Abs(y));
                 if (testDistance > (maxThrowDistance * maxThrowDistance))
                 {
                     continue;
@@ -76,7 +76,7 @@ public class GrenadeAction : BaseAction
                 Vector3 testWorldPosition = LevelGrid.Instance.GetWorldPosition(testGridPosition);
                 Vector3 shootDirection = (testWorldPosition - unitWorldPosition).normalized;
                 float unitShoulderHeight = 1.7f;
-                if (Physics.Raycast(unitWorldPosition + Vector3.up * unitShoulderHeight,
+                if (Physics.Raycast(unitWorldPosition + -Vector3.forward * unitShoulderHeight,
                     shootDirection,
                     Vector3.Distance(unitWorldPosition, testWorldPosition),
                     obstaclesLayerMask))

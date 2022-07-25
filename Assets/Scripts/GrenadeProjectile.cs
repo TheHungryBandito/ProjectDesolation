@@ -14,24 +14,24 @@ public class GrenadeProjectile : MonoBehaviour
     private Action OnGrenadeBehaviourComplete;
     private Vector3 _targetPosition;
     private float totalDistance;
-    private Vector3 positionXZ;
+    private Vector3 positionXY;
 
     private void Update()
     {
-        Vector3 moveDirection = (_targetPosition - positionXZ).normalized;
+        Vector3 moveDirection = (_targetPosition - positionXY).normalized;
 
         float moveSpeed = 15f;
-        positionXZ += moveDirection * moveSpeed * Time.deltaTime;
+        positionXY += moveDirection * moveSpeed * Time.deltaTime;
 
-        float distance = Vector3.Distance(positionXZ, _targetPosition);
+        float distance = Vector3.Distance(positionXY, _targetPosition);
         float distanceNormalized = 1 - distance / totalDistance;
 
         float maxHeight = totalDistance / 4f;
-        float positionY = arcYAnimationCurve.Evaluate(distanceNormalized) * maxHeight;
-        transform.position = new Vector3(positionXZ.x, positionY, positionXZ.z);
+        float positionZ = arcYAnimationCurve.Evaluate(distanceNormalized) * maxHeight;
+        transform.position = new Vector3(positionXY.x, positionXY.y, -positionZ);
 
         float reachedTargetDistance = 0.2f;
-        if (Vector3.Distance(positionXZ, _targetPosition) < reachedTargetDistance)
+        if (Vector3.Distance(positionXY, _targetPosition) < reachedTargetDistance)
         {
             //Take Grid Cellsize into account when setting radius
             float damageRadius = 4f;
@@ -67,9 +67,9 @@ public class GrenadeProjectile : MonoBehaviour
         this.OnGrenadeBehaviourComplete = onGrenadeBehaviourComplete;
         this._targetPosition = LevelGrid.Instance.GetWorldPosition(targetGridPosition);
 
-        positionXZ = transform.position;
-        positionXZ.y = 0;
-        totalDistance = Vector3.Distance(positionXZ, _targetPosition);
+        positionXY = transform.position;
+        positionXY.z = 0;
+        totalDistance = Vector3.Distance(positionXY, _targetPosition);
 
     }
 }

@@ -80,9 +80,11 @@ public class MeleeAction : BaseAction
     }
     private void Aim()
     {
-        Vector3 aimDir = (targetUnit.GetWorldPosition() - transform.position).normalized;
+        Vector3 aimDirection = (targetUnit.GetWorldPosition() - transform.position).normalized;
+        Quaternion quatTargetRotation = Quaternion.FromToRotation(Vector3.up, aimDirection);
+
         float rotateSpeed = 10f;
-        transform.forward = Vector3.Slerp(transform.forward, aimDir, Time.deltaTime * rotateSpeed);
+        transform.rotation = Quaternion.Slerp(transform.rotation, quatTargetRotation, Time.deltaTime * rotateSpeed);
     }
 
     public override string GetActionName()
@@ -111,9 +113,9 @@ public class MeleeAction : BaseAction
 
         for (int x = -maxMeleeDistance; x <= maxMeleeDistance; x++)
         {
-            for (int z = -maxMeleeDistance; z <= maxMeleeDistance; z++)
+            for (int y = -maxMeleeDistance; y <= maxMeleeDistance; y++)
             {
-                GridPosition offsetGridPosition = new GridPosition(x, z);
+                GridPosition offsetGridPosition = new GridPosition(x, y);
                 GridPosition testGridPosition = unitGridPosition + offsetGridPosition;
 
                 if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
