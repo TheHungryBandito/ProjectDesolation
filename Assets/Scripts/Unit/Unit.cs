@@ -20,7 +20,6 @@ public class Unit : MonoBehaviour
     private int actionPoints = ACTION_POINTS_MAX;
 
 
-
     private void Awake()
     {
         healthSystem = GetComponent<HealthSystem>();
@@ -112,7 +111,6 @@ public class Unit : MonoBehaviour
             OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
         }
     }
-
 
     public bool IsEnemy()
     {

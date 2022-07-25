@@ -1,10 +1,16 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GridObject
 {
+    public event EventHandler<OnUnitAddedEventArgs> OnUnitChanged;
 
+    public class OnUnitAddedEventArgs : EventArgs
+    {
+        public Unit unit;
+    }
 
     private GridSystem<GridObject> gridSystem;
     private GridPosition gridPosition;
@@ -31,10 +37,18 @@ public class GridObject
     public void AddUnit(Unit unit)
     {
         unitList.Add(unit);
+        OnUnitChanged?.Invoke(this, new OnUnitAddedEventArgs
+        {
+            unit = unit,
+        });
     }
     public void RemoveUnit(Unit unit)
     {
         unitList.Remove(unit);
+        OnUnitChanged?.Invoke(this, new OnUnitAddedEventArgs
+        {
+            unit = unit,
+        });
     }
 
     public List<Unit> GetUnitList()

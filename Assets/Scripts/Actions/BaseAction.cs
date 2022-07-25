@@ -87,4 +87,13 @@ public abstract class BaseAction : MonoBehaviour
     }
 
     public abstract EnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
+
+    private void OnDestroy()
+    {
+        if(!isActive)
+        {
+            return;
+        }
+        ActionComplete();
+    }
 }

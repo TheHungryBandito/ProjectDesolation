@@ -7,24 +7,48 @@ public class MoveAction : BaseAction
 {
     public event EventHandler OnStartMoving;
     public event EventHandler OnStopMoving;
-    [SerializeField] private int maxMoveDistance = 2;
+    
 
     private List<Vector3> positionList;
     private int currentPositionIndex;
+    [SerializeField] private int maxMoveDistance = 2;
+    private int originalMaxMoveDistance;
+    private int turnsUntilMovementReset = 0;
+
+    private void Start()
+    {
+        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+        originalMaxMoveDistance = maxMoveDistance;
+    }
+
+    private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
+    {
+        if (turnsUntilMovementReset == 0)
+        {
+            return;
+        }
+
+        turnsUntilMovementReset -= 1;
+
+        if (turnsUntilMovementReset == 0)
+        {
+            maxMoveDistance = originalMaxMoveDistance;
+        }
+    }
 
     private void Update()
     {
         if(!isActive) 
         { 
-            return; 
+            return;
         }
 
         Vector3 targetPosition = positionList[currentPositionIndex];
         Vector3 moveDirection = (targetPosition - transform.position).normalized;
+        Quaternion quatTargetRotation = Quaternion.FromToRotation(Vector3.up, moveDirection);
 
         float rotateSpeed = 10f;
-        transform.forward = Vector3.Slerp(transform.forward, moveDirection, Time.deltaTime * rotateSpeed);
-
+        transform.rotation = Quaternion.Slerp(new Quaternion(0, 0, transform.rotation.z, transform.rotation.w), quatTargetRotation, Time.deltaTime * rotateSpeed);
         float stoppingDistance = 0.1f;
         if (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
         {
@@ -120,14 +144,39 @@ public class MoveAction : BaseAction
     {
         return 1;
     }
+    public int GetMaxMovementDistance()
+    {
+        return maxMoveDistance;
+    }
+    public int GetOriginalMaxMoveDistance()
+    {
+        return originalMaxMoveDistance;
+    }
+    public void ModifyMaxMovementDistance(int maxMoveDistance, int turnsUntilMovementReset)
+    {
+        this.maxMoveDistance = maxMoveDistance;
+        this.turnsUntilMovementReset = turnsUntilMovementReset;
+    }
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
         int targetCountAtGridPosition = unit.GetAction<ShootAction>()
             .GetTargetCountAtPosition(gridPosition);
-        return new EnemyAIAction
+
+        if (Mathf.RoundToInt((1 - unit.GetHealthNormalized()) * 100f) > 50f)
         {
-            gridPosition = gridPosition,
-            actionValue = targetCountAtGridPosition * 10
-        };
+            return new EnemyAIAction
+            {
+                gridPosition = gridPosition,
+                actionValue = 200 / (targetCountAtGridPosition + 1)
+            };
+        }
+        else
+        {
+            return new EnemyAIAction
+            {
+                gridPosition = gridPosition,
+                actionValue = targetCountAtGridPosition * 10
+            };
+        }
     }
 }

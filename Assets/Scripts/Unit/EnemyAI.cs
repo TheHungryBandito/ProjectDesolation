@@ -12,7 +12,6 @@ public class EnemyAI : MonoBehaviour
     }
 
     private State state;
-
     private float turnTimer;
 
     private void Awake()
@@ -52,15 +51,11 @@ public class EnemyAI : MonoBehaviour
             case State.Busy:
                 break;
         }
-
-        
     }
-
     private void SetStateTakingTurn()
     {
         state = State.TakingTurn;
     }
-
     private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
     {
         if(TurnSystem.Instance.IsPlayerTurn())
@@ -70,10 +65,8 @@ public class EnemyAI : MonoBehaviour
         state = State.TakingTurn;
         turnTimer = 2f;
     }
-
     private bool TryTakeEnemyAIAction(Action onEnemyAIActionComplete)
     {
-        Debug.Log("Taking Enemy AI Action");
         foreach (Unit enemyUnit in UnitManager.Instance.GetEnemyUnitList())
         {
             if(TryTakeEnemyAIAction(enemyUnit, onEnemyAIActionComplete))
@@ -109,10 +102,9 @@ public class EnemyAI : MonoBehaviour
                 }
             }
         }
-
         if(bestEnemyAIAction != null && enemyUnit.TrySpendActionPointsToTakeAction(bestBaseAction))
         {
-            Debug.Log($"{this.gameObject.name} do {bestBaseAction.GetActionName()}");
+            Debug.Log($"{this.gameObject.name} starting {bestBaseAction.GetActionName()}");
             bestBaseAction.TakeAction(bestEnemyAIAction.gridPosition, onEnemyAIActionComplete);
             return true;
         } else

@@ -17,7 +17,7 @@ public class SpinAction : BaseAction
         if (!isActive) { return; }
 
         float spinAmount = 360f * Time.deltaTime;
-        transform.eulerAngles += new Vector3(0, spinAmount, 0);
+        transform.eulerAngles += new Vector3(0, 0, spinAmount);
 
         totalSpinAmount += spinAmount;
 

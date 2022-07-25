@@ -32,14 +32,14 @@ public class GridSystemVisual : MonoBehaviour
 
         for (int x = 0; x < width; x++)
         {
-            for(int z = 0; z < height; z++)
+            for(int y = 0; y < height; y++)
             {
-                GridPosition gridPosition = new GridPosition(x, z);
+                GridPosition gridPosition = new GridPosition(x, y);
                 Transform gridSystemVisualSingleTransform = Instantiate(gridSystemVisualSinglePrefab, 
                     LevelGrid.Instance.GetWorldPosition(gridPosition), 
                     Quaternion.identity);
 
-                gridSystemVisualSingleArray[x, z] = gridSystemVisualSingleTransform.GetComponent<GridSystemVisualSingle>();
+                gridSystemVisualSingleArray[x, y] = gridSystemVisualSingleTransform.GetComponent<GridSystemVisualSingle>();
 
             }
         }
@@ -48,6 +48,7 @@ public class GridSystemVisual : MonoBehaviour
         LevelGrid.Instance.OnAnyUnitMovedGridPosition += LevelGrid_OnAnyUnitMovedGridPosition;
         Unit.OnAnyUnitDead += Unit_OnAnyUnitDead;
         PathfindingUpdater.Instance.OnPathFindingUpdated += PathfindingUpdater_OnPathFindingUpdated;
+        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
 
         UpdateGridVisual();
     }
@@ -58,9 +59,9 @@ public class GridSystemVisual : MonoBehaviour
         int height = LevelGrid.Instance.GetHeight();
         for (int x = 0; x < width; x++)
         {
-            for (int z = 0; z < height; z++)
+            for (int y = 0; y < height; y++)
             {
-                gridSystemVisualSingleArray[x, z].Hide();
+                gridSystemVisualSingleArray[x, y].Hide();
             }
         }
     }
@@ -71,9 +72,9 @@ public class GridSystemVisual : MonoBehaviour
 
         for(int x = -maxRange; x <= maxRange; x++)
         {
-            for(int z = -maxRange; z <= maxRange; z++)
+            for(int y = -maxRange; y <= maxRange; y++)
             {
-                GridPosition offsetGridPosition = new GridPosition(x, z);
+                GridPosition offsetGridPosition = new GridPosition(x, y);
                 GridPosition testGridPosition = gridPosition + offsetGridPosition;
 
                 if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
@@ -81,7 +82,7 @@ public class GridSystemVisual : MonoBehaviour
                     continue;
                 }
 
-                int testDistance = (Mathf.Abs(x) * Mathf.Abs(x)) + (Mathf.Abs(z) * Mathf.Abs(z));
+                int testDistance = (Mathf.Abs(x) * Mathf.Abs(x)) + (Mathf.Abs(y) * Mathf.Abs(y));
                 if (testDistance > (maxRange * maxRange))
                 {
                     continue;
@@ -104,9 +105,9 @@ public class GridSystemVisual : MonoBehaviour
 
         for (int x = -maxRange; x <= maxRange; x++)
         {
-            for (int z = -maxRange; z <= maxRange; z++)
+            for (int y = -maxRange; y <= maxRange; y++)
             {
-                GridPosition offsetGridPosition = new GridPosition(x, z);
+                GridPosition offsetGridPosition = new GridPosition(x, y);
                 GridPosition testGridPosition = gridPosition + offsetGridPosition;
 
                 if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
@@ -114,7 +115,7 @@ public class GridSystemVisual : MonoBehaviour
                     continue;
                 }
 
-                int testDistance = Mathf.Abs(x) + Mathf.Abs(z);
+                int testDistance = Mathf.Abs(x) + Mathf.Abs(y);
 
                 if (testDistance < minRange)
                 {
@@ -126,11 +127,12 @@ public class GridSystemVisual : MonoBehaviour
             }
         }
     }
+
     public void ShowGridPositionList(List<GridPosition> gridPositions, GridVisualTypeSO gridVisualTypeSO)
     {
         for (int i = 0; i < gridPositions.Count; i++)
         {
-            gridSystemVisualSingleArray[gridPositions[i].x, gridPositions[i].z].Show(gridVisualTypeSO.GetMaterial());
+            gridSystemVisualSingleArray[gridPositions[i].x, gridPositions[i].y].Show(gridVisualTypeSO.GetMaterial());
         }
     }
 
@@ -165,6 +167,12 @@ public class GridSystemVisual : MonoBehaviour
                         meleeAction.GetMinMeleeDistance(),
                         meleeAction.GetSecondaryGridVisualTypeSO());
                     break;
+                case OverwatchAction overwatchAction:
+                    ShowGridPositionRangeCircle(selectedUnit.GetGridPosition(),
+                        overwatchAction.GetMaxShootDistance(),
+                        overwatchAction.GetMinShootDistance(),
+                        overwatchAction.GetSecondaryGridVisualTypeSO());
+                    break;
                 default:
                     break;
             }
@@ -187,6 +195,10 @@ public class GridSystemVisual : MonoBehaviour
         UpdateGridVisual();
     }
     private void PathfindingUpdater_OnPathFindingUpdated(object sender, EventArgs e)
+    {
+        UpdateGridVisual();
+    }
+    private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
     {
         UpdateGridVisual();
     }

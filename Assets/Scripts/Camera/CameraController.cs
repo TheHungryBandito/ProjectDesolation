@@ -30,8 +30,8 @@ public class CameraController : MonoBehaviour
     private void Update()
     {
         HandleMovement();
-        HandleRotation();
-        HandleZoom();
+        //HandleRotation();
+        //HandleZoom();
     }
 
     private void HandleMovement()
@@ -39,7 +39,7 @@ public class CameraController : MonoBehaviour
         Vector2 inputMoveDir = InputManager.Instance.GetCameraMoveVector2();
 
         float moveSpeed = 10f;
-        Vector3 moveVector = transform.forward * inputMoveDir.y + transform.right * inputMoveDir.x;
+        Vector3 moveVector = transform.up * inputMoveDir.y + transform.right * inputMoveDir.x;
         transform.position += moveVector * moveSpeed * Time.deltaTime;
     }
 
